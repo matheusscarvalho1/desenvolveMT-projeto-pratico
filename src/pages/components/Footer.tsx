@@ -6,7 +6,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="mt-12 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 py-8 text-gray-300">
+    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 py-10 text-gray-300">
       <div className="container mx-auto flex flex-col items-center justify-between md:flex-row md:px-4">
         <p className="text-sm md:text-base">
           &copy; Todos os direitos reservados
