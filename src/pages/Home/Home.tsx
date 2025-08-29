@@ -143,7 +143,7 @@ const Home = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-1 items-center space-y-6 px-6 md:grid-cols-3 md:gap-6 xl:grid-cols-6"
+            className="grid grid-cols-1 items-center space-y-6 px-6 md:grid-cols-3 md:gap-6 md:space-y-0 lg:grid-cols-5 xl:grid-cols-6"
           >
             <FormField
               control={form.control}
@@ -262,7 +262,7 @@ const Home = () => {
                 </FormItem>
               )}
             />
-            <div className="grid gap-4 md:flex">
+            <div className="grid gap-2 md:mt-4 md:flex md:items-center lg:mt-0 xl:mt-4">
               <Button className="cursor-pointer" size="lg" type="submit">
                 <MagnifyingGlassIcon />
                 Filtrar
