@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import type { PersonDTO } from "../../../interface/interface";
+import DialogDetailsCard from "./DialogDetailsCard";
 
 interface DetailsProps {
   data: PersonDTO;
@@ -13,6 +15,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
   const handleHomePage = () => {
     navigate("/");
   };
+  const [loginOpen, setLoginOpen] = useState<boolean>(false);
   return (
     <>
       <div className="flex min-h-screen flex-col bg-gray-50">
@@ -188,9 +191,10 @@ const DetailsCard = ({ data }: DetailsProps) => {
               >
                 Voltar para a página inicial
               </Button>
-              <Button className="cursor-pointer" size="lg">
-                Adicionar mais informações
-              </Button>
+              <DialogDetailsCard
+                isOpen={loginOpen}
+                onOpenChange={setLoginOpen}
+              />
             </div>
           </div>
         </div>
