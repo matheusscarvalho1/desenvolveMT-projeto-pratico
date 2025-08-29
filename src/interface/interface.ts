@@ -33,3 +33,13 @@ export interface PersonDTO {
   urlFoto?: string;
   ultimaOcorrencia?: OcorrenciaDTO;
 }
+
+export interface FormFilter {
+  nome?: string;
+  faixaIdadeInicial?: number;
+  faixaIdadeFinal?: number;
+  sexo?: string;
+  status?: string;
+  page?: number;
+  size?: number;
+}
