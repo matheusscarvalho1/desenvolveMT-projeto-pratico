@@ -19,12 +19,18 @@ const PersonCard = ({ pessoa }: PersonCardProps) => {
       key={pessoa.id}
       className="overflow-hidden rounded-xl border border-gray-700 bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
     >
-      <div className="h-90 w-full p-6">
-        <img
-          src={pessoa.urlFoto}
-          alt={pessoa.nome}
-          className="h-full w-full transform rounded-xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
-        />
+      <div className="flex h-90 w-full items-center justify-center p-6">
+        {pessoa.urlFoto ? (
+          <img
+            src={pessoa.urlFoto}
+            alt={pessoa.nome}
+            className="h-full w-full transform rounded-xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+          />
+        ) : (
+          <div className="text-muted-foreground flex h-80 w-80 items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 italic">
+            Imagem não fornecida
+          </div>
+        )}
       </div>
       <div className="space-y-2 p-5">
         <Badge

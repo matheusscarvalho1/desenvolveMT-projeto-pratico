@@ -17,14 +17,14 @@ const DetailsCard = ({ data }: DetailsProps) => {
     <>
       <div className="flex min-h-screen flex-col bg-gray-50">
         <div className="flex flex-grow justify-center px-4 py-6">
-          <div className="w-full max-w-7xl rounded-lg bg-white p-6 shadow">
+          <div className="container rounded-lg bg-white p-6 shadow">
             <h1 className="mb-6 text-2xl font-bold text-gray-800">
               <strong>{data.nome}</strong>
             </h1>
             <div className="space-y-4">
-              <div className="flex flex-col gap-6 md:flex-row">
+              <div className="flex flex-col justify-center gap-6 sm:flex sm:flex-row md:justify-start">
                 {data.urlFoto ? (
-                  <div className="flex justify-center md:justify-start">
+                  <div className="flex md:justify-start">
                     <img
                       src={data.urlFoto}
                       alt={data.nome}
@@ -32,8 +32,8 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     />
                   </div>
                 ) : (
-                  <div className="text-muted-foreground text-center italic">
-                    Imagem não disponível
+                  <div className="text-muted-foreground flex h-60 w-60 items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 italic">
+                    Imagem não fornecida
                   </div>
                 )}
                 <div className="flex flex-col space-y-3">
