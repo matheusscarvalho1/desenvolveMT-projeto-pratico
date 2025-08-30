@@ -40,6 +40,14 @@ export interface FormFilter {
   faixaIdadeFinal?: number;
   sexo?: string;
   status?: string;
-  page?: number;
-  size?: number;
+  pagina?: number;
+  porPagina?: number;
+}
+
+export interface OcorrenciaInfoDTO {
+  ocoId: number;
+  informacao: string;
+  data: string;
+  id: number;
+  anexos?: string[];
 }

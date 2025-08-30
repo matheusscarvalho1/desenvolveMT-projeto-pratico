@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import type { PersonDTO } from "../../../interface/interface";
+import type {
+  OcorrenciaInfoDTO,
+  PersonDTO,
+} from "../../../interface/interface";
+import { api } from "../../../lib/api";
+import Loading from "../../components/Loading";
+import NotFound from "../../Error/not-found-error";
 import DialogDetailsCard from "./DialogDetailsCard";
 
 interface DetailsProps {
@@ -11,11 +18,58 @@ interface DetailsProps {
 }
 
 const DetailsCard = ({ data }: DetailsProps) => {
+  const [ocorrenciaResource, setOcorrenciaResource] = useState<
+    OcorrenciaInfoDTO[]
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>();
+
+  const sortOcorrencias = (data: OcorrenciaInfoDTO[]) => {
+    return [...data].sort(
+      (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
+    );
+  };
+  const fetchData = async (ocorrenciaId: number) => {
+    if (!ocorrenciaId) return;
+    setLoading(true);
+    try {
+      const response = await api.get(
+        `/ocorrencias/informacoes-desaparecido?ocorrenciaId=${ocorrenciaId}`,
+      );
+
+      const sortedData = sortOcorrencias(response.data);
+
+      setOcorrenciaResource(sortedData);
+      // console.log("response: ", response);
+      console.log("response.data:", response.data);
+    } catch {
+      setError("Erro na requisição de dados, statusCode: 500");
+      toast.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (data.ultimaOcorrencia) {
+      fetchData(data.ultimaOcorrencia.ocoId);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   const navigate = useNavigate();
   const handleHomePage = () => {
     navigate("/");
   };
-  const [loginOpen, setLoginOpen] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  if (!data.ultimaOcorrencia) {
+    return <NotFound />;
+  }
+
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <>
       <div className="flex min-h-screen flex-col bg-gray-50">
@@ -69,6 +123,31 @@ const DetailsCard = ({ data }: DetailsProps) => {
                           : "Desaparecido"}
                     </Badge>
                   </div>
+                </div>
+                <div className="max-h-89 space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-2">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Últimas informações
+                  </h2>
+                  {ocorrenciaResource?.length > 0 ? (
+                    ocorrenciaResource.map((item: OcorrenciaInfoDTO) => (
+                      <div
+                        key={item.id}
+                        className="rounded-md border-b border-gray-200 pb-2"
+                      >
+                        <p>
+                          <strong>Data: </strong>
+                          {new Date(item.data).toLocaleDateString("pt-BR")}
+                        </p>
+                        <p>
+                          <strong>Informação:</strong> {item.informacao}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic">
+                      Até então nenhuma informação adicional...
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -192,8 +271,9 @@ const DetailsCard = ({ data }: DetailsProps) => {
                 Voltar para a página inicial
               </Button>
               <DialogDetailsCard
-                isOpen={loginOpen}
-                onOpenChange={setLoginOpen}
+                isOpen={dialogOpen}
+                onOpenChange={setDialogOpen}
+                ocoId={data.ultimaOcorrencia.ocoId}
               />
             </div>
           </div>
