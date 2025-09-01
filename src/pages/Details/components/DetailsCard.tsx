@@ -96,7 +96,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
               <strong>{data.nome}</strong>
             </h1>
             <div className="space-y-4">
-              <div className="flex flex-col justify-center gap-6 sm:flex md:flex-row">
+              <div className="flex flex-col items-start gap-6 sm:flex md:flex-row">
                 {data.urlFoto ? (
                   <div>
                     <img
@@ -149,9 +149,9 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     ocorrenciaResource.map((item: OcorrenciaInfoDTO) => (
                       <div
                         key={item.id}
-                        className="w-full rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-300"
+                        className="w-full rounded-lg border border-blue-500 bg-white p-3 transition-colors hover:bg-gray-50"
                       >
-                        <div className="mb-1 flex flex-col items-center justify-between sm:flex-row">
+                        <div className="mb-1 flex flex-col justify-between sm:flex-row">
                           {/* Exibe a data, tentei usar somente o new Data, acredito que por algum motivo de fuso sempre mostrava um dia antes da data correta */}
                           <span className="text-sm text-gray-500">
                             {format(parseISO(item.data), "dd/MM/yyyy", {
