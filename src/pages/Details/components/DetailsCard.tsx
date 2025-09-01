@@ -1,3 +1,6 @@
+import { AxiosError } from "axios";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
@@ -22,16 +25,24 @@ const DetailsCard = ({ data }: DetailsProps) => {
     OcorrenciaInfoDTO[]
   >([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>();
+  const [error, setError] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+  const handleHomePage = () => {
+    navigate("/");
+  };
 
   const sortOcorrencias = (data: OcorrenciaInfoDTO[]) => {
     return [...data].sort(
-      (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
+      (DateA, DateB) =>
+        new Date(DateB.data).getTime() - new Date(DateA.data).getTime(),
     );
   };
+
   const fetchData = async (ocorrenciaId: number) => {
-    if (!ocorrenciaId) return;
     setLoading(true);
+    if (!ocorrenciaId) return;
     try {
       const response = await api.get(
         `/ocorrencias/informacoes-desaparecido?ocorrenciaId=${ocorrenciaId}`,
@@ -40,11 +51,22 @@ const DetailsCard = ({ data }: DetailsProps) => {
       const sortedData = sortOcorrencias(response.data);
 
       setOcorrenciaResource(sortedData);
-      // console.log("response: ", response);
       console.log("response.data:", response.data);
-    } catch {
-      setError("Erro na requisição de dados, statusCode: 500");
-      toast.error(error);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const msg = error.response?.data?.message || error.message;
+        console.error("Erro ao enviar:", msg);
+        setError(msg);
+        toast.error(msg);
+      } else if (error instanceof Error) {
+        console.error("Erro ao enviar:", error.message);
+        setError(error.message);
+        toast.error(error.message);
+      } else {
+        console.error("Erro desconhecido:", error);
+        setError("Erro desconhecido");
+        toast.error("Erro desconhecido");
+      }
     } finally {
       setLoading(false);
     }
@@ -58,11 +80,6 @@ const DetailsCard = ({ data }: DetailsProps) => {
     }
   }, []);
 
-  const navigate = useNavigate();
-  const handleHomePage = () => {
-    navigate("/");
-  };
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   if (!data.ultimaOcorrencia) {
     return <NotFound />;
   }
@@ -79,9 +96,9 @@ const DetailsCard = ({ data }: DetailsProps) => {
               <strong>{data.nome}</strong>
             </h1>
             <div className="space-y-4">
-              <div className="flex flex-col justify-center gap-6 sm:flex sm:flex-row md:justify-start">
+              <div className="flex flex-col justify-center gap-6 sm:flex md:flex-row">
                 {data.urlFoto ? (
-                  <div className="flex md:justify-start">
+                  <div>
                     <img
                       src={data.urlFoto}
                       alt={data.nome}
@@ -132,19 +149,40 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     ocorrenciaResource.map((item: OcorrenciaInfoDTO) => (
                       <div
                         key={item.id}
-                        className="rounded-md border-b border-gray-200 pb-2"
+                        className="w-full rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-300"
                       >
-                        <p>
-                          <strong>Data: </strong>
-                          {new Date(item.data).toLocaleDateString("pt-BR")}
-                        </p>
-                        <p>
-                          <strong>Informação:</strong> {item.informacao}
+                        <div className="mb-1 flex flex-col items-center justify-between sm:flex-row">
+                          {/* Exibe a data, tentei usar somente o new Data, acredito que por algum motivo de fuso sempre mostrava um dia antes da data correta */}
+                          <span className="text-sm text-gray-500">
+                            {format(parseISO(item.data), "dd/MM/yyyy", {
+                              locale: ptBR,
+                            })}
+                          </span>
+                          {item.anexos && (
+                            <div className="flex flex-wrap gap-2">
+                              {item.anexos.map((anexo: string, idx: number) => (
+                                <a
+                                  key={idx}
+                                  href={anexo.trim()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 transition-colors hover:bg-blue-200"
+                                >
+                                  Anexo {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-gray-700">
+                          <strong>Informação:</strong>{" "}
+                          <span className="break-words">{item.informacao}</span>
                         </p>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 italic">
+                    <p className="text-center text-gray-400 italic">
                       Até então nenhuma informação adicional...
                     </p>
                   )}
@@ -274,6 +312,9 @@ const DetailsCard = ({ data }: DetailsProps) => {
                 isOpen={dialogOpen}
                 onOpenChange={setDialogOpen}
                 ocoId={data.ultimaOcorrencia.ocoId}
+                onAddInfo={(newInfo) =>
+                  setOcorrenciaResource((prev) => [newInfo, ...prev])
+                }
               />
             </div>
           </div>

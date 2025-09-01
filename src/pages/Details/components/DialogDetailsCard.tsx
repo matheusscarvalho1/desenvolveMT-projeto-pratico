@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "../../../components/ui/button";
@@ -21,43 +22,46 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../../../components/ui/form";
+import { Input } from "../../../components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../../../components/ui/popover";
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from "../../../components/ui/shadcn-io/dropzone/index";
 import { Textarea } from "../../../components/ui/textarea";
+import type { OcorrenciaInfoDTO } from "../../../interface/interface";
 import { api } from "../../../lib/api";
 import { cn } from "../../../lib/utils";
 interface LoginDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   ocoId: number;
+  onAddInfo: (newInfo: OcorrenciaInfoDTO) => void; // ✅
 }
 
 const DialogDetailsCard = ({
   isOpen,
   onOpenChange,
   ocoId,
+  onAddInfo,
 }: LoginDialogProps) => {
   const formSchema = z.object({
     informacao: z.string().min(5, {
       message: "Mensagem deve ter pelo menos 5 caracteres.",
     }),
+    descricao: z.string().min(5, {
+      message: "Mensagem deve ter pelo menos 5 caracteres.",
+    }),
     data: z.date({
       message: "Por favor, selecione uma data",
     }),
-    anexos: z.any().optional(),
+    files: z.any().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -65,30 +69,24 @@ const DialogDetailsCard = ({
     defaultValues: {
       informacao: "",
       data: undefined,
-      anexos: undefined,
+      files: undefined,
     },
   });
-  const [files, setFiles] = useState<File[] | undefined>();
-  const handleDrop = (files: File[]) => {
-    console.log(files);
-    setFiles(files);
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const formData = new FormData();
       formData.append("ocoId", ocoId.toString());
       formData.append("informacao", values.informacao);
+      formData.append("data", values.data.toISOString().split("T")[0]);
+      formData.append("descricao", values.descricao);
 
-      const formattedDate = values.data.toISOString().split("T")[0];
-      formData.append("data", formattedDate);
-
-      if (values.anexos) {
-        values.anexos.forEach((file: File) => {
-          formData.append("anexos", file);
+      if (values.files && values.files.length > 0) {
+        values.files.forEach((file: File) => {
+          formData.append("files", file);
         });
       }
-
+      console.log(values);
       const response = await api.post(
         "/ocorrencias/informacoes-desaparecido",
         formData,
@@ -99,9 +97,22 @@ const DialogDetailsCard = ({
         },
       );
 
-      console.log("Sucesso:", response.data);
-    } catch (error: any) {
-      console.error("Erro ao enviar:", error.response?.data || error.message);
+      onAddInfo(response.data);
+      onOpenChange(false);
+      form.reset();
+      toast.success("Informação adicionada com sucesso!");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        console.error(
+          "Erro ao enviar: ",
+          error.response?.data || error.message,
+        );
+        toast.error(`Erro ao enviar: ${error.response?.data || error.message}`);
+      } else if (error instanceof Error) {
+        console.error("Erro ao enviar:", error.message);
+      } else {
+        console.error("Erro desconhecido:", error);
+      }
     }
   };
   return (
@@ -151,6 +162,7 @@ const DialogDetailsCard = ({
                           selected={field.value}
                           onSelect={field.onChange}
                           locale={ptBR}
+                          disabled={{ after: new Date() }}
                         />
                       </PopoverContent>
                     </Popover>
@@ -176,25 +188,51 @@ const DialogDetailsCard = ({
                 </FormItem>
               )}
             />
-            <Dropzone
-              accept={{
-                "image/*": [],
-                "application/pdf": [],
-                "application/msword": [],
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                  [],
-              }}
-              maxFiles={10}
-              maxSize={1024 * 1024 * 10}
-              minSize={1024}
-              onDrop={handleDrop}
-              onError={console.error}
-              src={files}
-            >
-              <DropzoneEmptyState />
-              <DropzoneContent />
-            </Dropzone>
-            <DialogFooter className="justify-">
+            <FormField
+              control={form.control}
+              name="files"
+              render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem>
+                  <FormLabel>Anexos</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...fieldProps}
+                      type="file"
+                      multiple
+                      accept="image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={(event) => {
+                        if (event.target.files) {
+                          onChange(Array.from(event.target.files));
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
+                    Word (.doc, .docx) e PDFs.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="descricao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição do Anexo</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="pl-4 text-sm"
+                      placeholder="Insira a descrição do anexo colocado no campo acima"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className="">
               <DialogClose asChild>
                 <Button type="button" variant="outline">
                   Cancelar

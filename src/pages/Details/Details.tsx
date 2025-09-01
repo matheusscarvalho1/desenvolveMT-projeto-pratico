@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { toast } from "sonner";
@@ -23,8 +24,15 @@ const Details = () => {
       try {
         const response = await api.get<PersonDTO>(`/pessoas/${id}`);
         setData(response.data);
-      } catch {
-        const errorMsg = "Não foi possível carregar os detalhes dessa pessoa";
+      } catch (error: unknown) {
+        let errorMsg = "Não foi possível carregar os detalhes dessa pessoa";
+
+        if (error instanceof AxiosError) {
+          errorMsg = error.response?.data?.message || errorMsg;
+        } else if (error instanceof Error) {
+          errorMsg = error.message;
+        }
+
         setError(errorMsg);
         toast.error(errorMsg);
       } finally {
@@ -35,7 +43,7 @@ const Details = () => {
     fetchPessoaDetails();
   }, [id]);
 
-  if (loading) return <Loading size={40} />;
+  if (loading) return <Loading />;
   if (!data?.id || Number(id) !== data.id) return <NotFound />;
   if (error) return <InternalServerError />;
 
