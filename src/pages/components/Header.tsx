@@ -6,7 +6,7 @@ const Header = () => {
           <h1 className="text-2xl font-bold tracking-wide">
             <a
               href="/"
-              className="transition-colors duration-200 hover:text-gray-200"
+              className="text-white transition-colors duration-200 hover:opacity-50"
             >
               Polícia Judiciária Civil de Mato Grosso
             </a>
