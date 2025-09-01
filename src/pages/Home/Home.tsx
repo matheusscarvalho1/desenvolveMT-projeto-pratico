@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,13 +10,21 @@ import { Button } from "../../components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../../components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -33,6 +42,9 @@ import Board from "./components/Board";
 
 const Home = () => {
   const [data, setData] = useState<PersonDTO[]>([]);
+  const [totalPages, setTotalPages] = useState<number>();
+  const [totalElements, setTotalElements] = useState<number>();
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FormFilter>({});
@@ -97,8 +109,8 @@ const Home = () => {
       const currentFilters = customFilters || filters;
 
       const params: FormFilter = {
-        page: pageNumber,
-        size: 10,
+        pagina: pageNumber,
+        porPagina: 10,
       };
 
       if (currentFilters.nome) params.nome = currentFilters.nome;
@@ -110,12 +122,29 @@ const Home = () => {
       if (currentFilters.status) params.status = currentFilters.status;
 
       const response = await api.get("/pessoas/aberto/filtro", { params });
+      console.log(params);
 
       setData(response.data.content);
-      console.log("Dados carregados:", response.data.content);
-    } catch {
-      setError("Erro na requisição de dados, statusCode: 500");
-      toast.error(error);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+      setCurrentPage(response.data.number);
+      console.log("response.data.content", response.data.content);
+      console.log("response.data:", response.data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        const msg = error.response?.data?.message || error.message;
+        console.error("Erro na requisição:", msg);
+        setError(msg);
+        toast.error(msg);
+      } else if (error instanceof Error) {
+        console.error("Erro na requisição:", error.message);
+        setError(error.message);
+        toast.error(error.message);
+      } else {
+        console.error("Erro desconhecido:", error);
+        setError("Erro desconhecido");
+        toast.error("Erro desconhecido");
+      }
     } finally {
       setLoading(false);
     }
@@ -125,7 +154,7 @@ const Home = () => {
     fetchData();
   }, []);
 
-  if (loading) return <Loading size={40} />;
+  if (loading) return <Loading />;
   if (error) return <InternalServerError />;
 
   return (
@@ -281,7 +310,27 @@ const Home = () => {
         </Form>
       </div>
       <Board data={data} />
-      <div className="container">Pagination</div>
+      <div className="container">
+        <h2>Pagination</h2>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">
+                {Number(currentPage!) + 1}
+              </PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
       <Footer />
     </div>
   );
