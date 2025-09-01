@@ -12,7 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster position="bottom-right" richColors gap={20} offset={90} />
-      <Suspense fallback={<Loading size={40} />}>
+      <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/details/:id" element={<Details />} />
