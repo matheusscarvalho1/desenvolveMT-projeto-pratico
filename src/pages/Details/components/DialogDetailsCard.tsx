@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
@@ -42,14 +41,14 @@ interface LoginDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   ocoId: number;
-  onAddInfo: (newInfo: OcorrenciaInfoDTO) => void; // ✅
+  onSaveSuccess?: (novaData: OcorrenciaInfoDTO) => void;
 }
 
 const DialogDetailsCard = ({
   isOpen,
   onOpenChange,
   ocoId,
-  onAddInfo,
+  onSaveSuccess,
 }: LoginDialogProps) => {
   const formSchema = z.object({
     informacao: z.string().min(5, {
@@ -68,6 +67,7 @@ const DialogDetailsCard = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       informacao: "",
+      descricao: "",
       data: undefined,
       files: undefined,
     },
@@ -75,20 +75,23 @@ const DialogDetailsCard = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      console.log(values);
       const formData = new FormData();
-      formData.append("ocoId", ocoId.toString());
-      formData.append("informacao", values.informacao);
-      formData.append("data", values.data.toISOString().split("T")[0]);
-      formData.append("descricao", values.descricao);
+      const params = new URLSearchParams({
+        informacao: values.informacao,
+        descricao: values.descricao,
+        data: values.data.toISOString().split("T")[0],
+        ocoId: ocoId.toString(),
+      });
 
       if (values.files && values.files.length > 0) {
         values.files.forEach((file: File) => {
           formData.append("files", file);
         });
       }
-      console.log(values);
+
       const response = await api.post(
-        "/ocorrencias/informacoes-desaparecido",
+        `/ocorrencias/informacoes-desaparecido?${params.toString()}`,
         formData,
         {
           headers: {
@@ -97,22 +100,15 @@ const DialogDetailsCard = ({
         },
       );
 
-      onAddInfo(response.data);
+      if (onSaveSuccess) {
+        onSaveSuccess(response.data);
+      }
+
       onOpenChange(false);
       form.reset();
       toast.success("Informação adicionada com sucesso!");
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        console.error(
-          "Erro ao enviar: ",
-          error.response?.data || error.message,
-        );
-        toast.error(`Erro ao enviar: ${error.response?.data || error.message}`);
-      } else if (error instanceof Error) {
-        console.error("Erro ao enviar:", error.message);
-      } else {
-        console.error("Erro desconhecido:", error);
-      }
+    } catch (error) {
+      console.error("Detalhe técnico do erro:", error);
     }
   };
   return (
@@ -208,6 +204,7 @@ const DialogDetailsCard = ({
                     />
                   </FormControl>
                   <FormDescription>
+                    O limite é de 2 arquivos por vez. <br />
                     Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
                     Word (.doc, .docx) e PDFs.
                   </FormDescription>
@@ -232,13 +229,19 @@ const DialogDetailsCard = ({
                 </FormItem>
               )}
             />
-            <DialogFooter className="">
+            <DialogFooter className="flex flex-col gap-3 md:justify-between">
               <DialogClose asChild>
-                <Button type="button" variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="cursor-pointer"
+                >
                   Cancelar
                 </Button>
               </DialogClose>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit" className="cursor-pointer">
+                Salvar
+              </Button>
             </DialogFooter>
           </form>
         </Form>

@@ -11,7 +11,7 @@ const Details = lazy(() => import("./pages/Details/Details"));
 function App() {
   return (
     <BrowserRouter>
-      <Toaster position="bottom-right" richColors gap={20} offset={90} />
+      <Toaster position="bottom-right" richColors gap={20} offset={75} />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<Home />} />

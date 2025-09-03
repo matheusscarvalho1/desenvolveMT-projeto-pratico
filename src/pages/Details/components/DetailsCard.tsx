@@ -1,9 +1,7 @@
-import { AxiosError } from "axios";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { toast } from "sonner";
+import { useNavigate, useSearchParams } from "react-router";
 
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
@@ -12,7 +10,9 @@ import type {
   PersonDTO,
 } from "../../../interface/interface";
 import { api } from "../../../lib/api";
+import { handleError } from "../../../lib/utils";
 import Loading from "../../components/Loading";
+import InternalServerError from "../../Error/internal-server-error";
 import NotFound from "../../Error/not-found-error";
 import DialogDetailsCard from "./DialogDetailsCard";
 
@@ -29,6 +29,11 @@ const DetailsCard = ({ data }: DetailsProps) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const statusFilter = searchParams.get("status");
+
+  const status = statusFilter === "LOCALIZADO" ? "Localizada" : "Desaparecida";
   const handleHomePage = () => {
     navigate("/");
   };
@@ -51,22 +56,12 @@ const DetailsCard = ({ data }: DetailsProps) => {
       const sortedData = sortOcorrencias(response.data);
 
       setOcorrenciaResource(sortedData);
-      console.log("response.data:", response.data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        const msg = error.response?.data?.message || error.message;
-        console.error("Erro ao enviar:", msg);
-        setError(msg);
-        toast.error(msg);
-      } else if (error instanceof Error) {
-        console.error("Erro ao enviar:", error.message);
-        setError(error.message);
-        toast.error(error.message);
-      } else {
-        console.error("Erro desconhecido:", error);
-        setError("Erro desconhecido");
-        toast.error("Erro desconhecido");
-      }
+      console.log(response);
+    } catch (error) {
+      const message = handleError(error);
+      setError(message);
+
+      console.error("Detalhe técnico do erro:", error);
     } finally {
       setLoading(false);
     }
@@ -80,6 +75,12 @@ const DetailsCard = ({ data }: DetailsProps) => {
     }
   }, []);
 
+  const handleRefreshOcorrencia = () => {
+    if (data.ultimaOcorrencia?.ocoId) {
+      fetchData(data.ultimaOcorrencia.ocoId);
+    }
+  };
+
   if (!data.ultimaOcorrencia) {
     return <NotFound />;
   }
@@ -87,6 +88,8 @@ const DetailsCard = ({ data }: DetailsProps) => {
   if (loading) {
     return <Loading />;
   }
+
+  if (error) return <InternalServerError />;
   return (
     <>
       <div className="flex min-h-screen flex-col bg-gray-50">
@@ -126,18 +129,12 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     <strong className="font-semibold">Status</strong>:{" "}
                     <Badge
                       className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                        data.vivo
-                          ? "bg-green-300 text-green-800"
-                          : "bg-red-300 text-red-800"
+                        status === "Desaparecida"
+                          ? "bg-red-300 text-red-800"
+                          : "bg-green-300 text-green-800"
                       }`}
                     >
-                      {data.vivo
-                        ? data.sexo === "FEMININO"
-                          ? "Localizada"
-                          : "Localizado"
-                        : data.sexo === "FEMININO"
-                          ? "Desaparecida"
-                          : "Desaparecido"}
+                      {status}
                     </Badge>
                   </div>
                 </div>
@@ -163,7 +160,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
                               {item.anexos.map((anexo: string, idx: number) => (
                                 <a
                                   key={idx}
-                                  href={anexo.trim()}
+                                  href={`${anexo.trim()}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 transition-colors hover:bg-blue-200"
@@ -312,9 +309,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
                 isOpen={dialogOpen}
                 onOpenChange={setDialogOpen}
                 ocoId={data.ultimaOcorrencia.ocoId}
-                onAddInfo={(newInfo) =>
-                  setOcorrenciaResource((prev) => [newInfo, ...prev])
-                }
+                onSaveSuccess={handleRefreshOcorrencia}
               />
             </div>
           </div>

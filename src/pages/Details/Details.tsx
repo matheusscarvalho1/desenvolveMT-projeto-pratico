@@ -1,10 +1,9 @@
-import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { toast } from "sonner";
 
 import type { PersonDTO } from "../../interface/interface";
 import { api } from "../../lib/api";
+import { handleError } from "../../lib/utils";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
@@ -24,17 +23,11 @@ const Details = () => {
       try {
         const response = await api.get<PersonDTO>(`/pessoas/${id}`);
         setData(response.data);
-      } catch (error: unknown) {
-        let errorMsg = "Não foi possível carregar os detalhes dessa pessoa";
+      } catch (error) {
+        const message = handleError(error);
+        setError(message);
 
-        if (error instanceof AxiosError) {
-          errorMsg = error.response?.data?.message || errorMsg;
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        }
-
-        setError(errorMsg);
-        toast.error(errorMsg);
+        console.error("Detalhe técnico do erro:", error);
       } finally {
         setLoading(false);
       }
