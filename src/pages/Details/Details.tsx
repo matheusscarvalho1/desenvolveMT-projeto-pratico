@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
-import jsonData from "../../abitus-pessoas.json";
+import jsonData from "../../../public/abitus-pessoas.json";
 import type { PersonDTO } from "../../interface/interface";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
