@@ -31,7 +31,6 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import type { FormFilter, PersonDTO } from "../../interface/interface";
-import { api } from "../../lib/api";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
@@ -97,7 +96,6 @@ const Home = () => {
     fetchData(0, {});
   };
 
-  // Funções de paginação
   const handlePageClick = (page: number) => {
     fetchData(page, filters);
   };
@@ -117,17 +115,14 @@ const Home = () => {
   const fetchData = (page: number = 0, filters?: FormFilter) => {
     try {
       if (Array.isArray(jsonData.data.content)) {
-        // Aqui podemos aplicar filtros simulando a API
         let result = [...jsonData.data.content];
 
-        // Filtro por nome
         if (filters?.nome) {
           result = result.filter((p) =>
             p.nome.toLowerCase().includes(filters.nome!.toLowerCase()),
           );
         }
 
-        // Filtro por faixa etária
         if (filters?.faixaIdadeInicial !== undefined) {
           result = result.filter((p) => p.idade >= filters.faixaIdadeInicial!);
         }
@@ -135,12 +130,10 @@ const Home = () => {
           result = result.filter((p) => p.idade <= filters.faixaIdadeFinal!);
         }
 
-        // Filtro por sexo
         if (filters?.sexo) {
           result = result.filter((p) => p.sexo === filters.sexo);
         }
 
-        // Filtro por status (vivo/desaparecido)
         if (filters?.status) {
           if (filters.status === "DESAPARECIDO") {
             result = result.filter((p) => !p.vivo);
@@ -150,7 +143,7 @@ const Home = () => {
         }
 
         setData(result);
-        setTotalPages(Math.ceil(result.length / 200)); // ajusta conforme seu pageSize
+        setTotalPages(Math.ceil(result.length / 200));
         setCurrentPage(page);
       } else {
         throw new Error("JSON inválido");

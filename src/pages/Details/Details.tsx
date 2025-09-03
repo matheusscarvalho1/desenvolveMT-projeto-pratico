@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
+import jsonData from "../../abitus-pessoas.json";
 import type { PersonDTO } from "../../interface/interface";
-import { api } from "../../lib/api";
-import { handleError } from "../../lib/utils";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
@@ -18,22 +17,21 @@ const Details = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPessoaDetails = async () => {
+    try {
       setLoading(true);
-      try {
-        const response = await api.get<PersonDTO>(`/pessoas/${id}`);
-        setData(response.data);
-      } catch (error) {
-        const message = handleError(error);
-        setError(message);
-
-        console.error("Detalhe técnico do erro:", error);
-      } finally {
-        setLoading(false);
+      const pessoa = jsonData.data.content.find(
+        (item) => item.id === Number(id),
+      );
+      setData(pessoa);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error));
       }
-    };
-
-    fetchPessoaDetails();
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   if (loading) return <Loading />;

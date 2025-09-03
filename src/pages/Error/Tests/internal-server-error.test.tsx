@@ -4,7 +4,6 @@ import { vi } from "vitest";
 
 import InternalServerError from "../internal-server-error";
 
-// Mock básico dos componentes
 vi.mock("../../components/Header.tsx", () => {
   return {
     default: () => <header>Header</header>,

@@ -15,12 +15,12 @@ export interface OcorrenciaEntrevDesapDTO {
 }
 
 export interface OcorrenciaDTO {
-  dtDesaparecimento: string; // sempre string ISO
+  dtDesaparecimento: string;
   dataLocalizacao: string | null;
   encontradoVivo: boolean;
   localDesaparecimentoConcat: string;
   ocoId: number;
-  ocorrenciaEntrevDesapDTO: OcorrenciaEntrevDesapDTO | null; // ← aqui
+  ocorrenciaEntrevDesapDTO: OcorrenciaEntrevDesapDTO | null;
   listaCartaz: OcorrenciaCartazDTO[] | null;
 }
 
@@ -43,8 +43,6 @@ export interface FormFilter {
   pagina?: number;
   porPagina?: number;
 }
-
-/** Esse DTO parece ser de outro endpoint, não do filtro de pessoas */
 export interface OcorrenciaInfoDTO {
   ocoId: number;
   informacao: string;

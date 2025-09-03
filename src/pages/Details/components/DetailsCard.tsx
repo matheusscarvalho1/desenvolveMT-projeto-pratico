@@ -10,7 +10,6 @@ import type {
   OcorrenciaInfoDTO,
   PersonDTO,
 } from "../../../interface/interface";
-import { api } from "../../../lib/api";
 import { handleError } from "../../../lib/utils";
 import Loading from "../../components/Loading";
 import InternalServerError from "../../Error/internal-server-error";
@@ -54,10 +53,10 @@ const DetailsCard = ({ data }: DetailsProps) => {
       const ocorrencias: OcorrenciaInfoDTO[] = jsonData.data.content.map(
         (item) => ({
           id: item.id,
-          ocoId: item.ocoId,
-          data: item.dtDesaparecimento,
-          informacao: item.informacao || "",
-          anexos: item.anexos || [],
+          ocoId: item.ultimaOcorrencia.ocoId,
+          data: item.ultimaOcorrencia.dtDesaparecimento,
+          informacao:
+            item.ultimaOcorrencia.ocorrenciaEntrevDesapDTO?.informacao || "",
         }),
       );
       const sortedData = sortOcorrencias(ocorrencias);
@@ -79,8 +78,12 @@ const DetailsCard = ({ data }: DetailsProps) => {
     }
   }, []);
 
-  const handleRefreshOcorrencia = () => {
-    if (data.ultimaOcorrencia?.ocoId) {
+  const handleRefreshOcorrencia = (novaOcorrencia?: OcorrenciaInfoDTO) => {
+    if (novaOcorrencia) {
+      setOcorrenciaResource((prev) =>
+        sortOcorrencias([novaOcorrencia, ...prev]),
+      );
+    } else if (data.ultimaOcorrencia?.ocoId) {
       fetchData(data.ultimaOcorrencia.ocoId);
     }
   };
@@ -146,14 +149,16 @@ const DetailsCard = ({ data }: DetailsProps) => {
                   <h2 className="text-2xl font-bold text-gray-800">
                     Últimas informações
                   </h2>
-                  {ocorrenciaResource?.length > 0 ? (
-                    ocorrenciaResource.map((item: OcorrenciaInfoDTO) => (
+                  {ocorrenciaResource
+                    ?.filter(
+                      (item) => item.informacao?.trim() || item.anexos?.length,
+                    )
+                    .map((item: OcorrenciaInfoDTO) => (
                       <div
                         key={item.id}
                         className="w-full rounded-lg border border-blue-500 bg-white p-3 transition-colors hover:bg-gray-50"
                       >
                         <div className="mb-1 flex flex-col justify-between sm:flex-row">
-                          {/* Exibe a data, tentei usar somente o new Data, acredito que por algum motivo de fuso sempre mostrava um dia antes da data correta */}
                           <span className="text-sm text-gray-500">
                             {format(parseISO(item.data), "dd/MM/yyyy", {
                               locale: ptBR,
@@ -164,7 +169,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
                               {item.anexos.map((anexo: string, idx: number) => (
                                 <a
                                   key={idx}
-                                  href={`${anexo.trim()}`}
+                                  href={anexo.trim()}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 transition-colors hover:bg-blue-200"
@@ -176,17 +181,16 @@ const DetailsCard = ({ data }: DetailsProps) => {
                           )}
                         </div>
 
-                        <p className="text-gray-700">
-                          <strong>Informação:</strong>{" "}
-                          <span className="break-words">{item.informacao}</span>
-                        </p>
+                        {item.informacao?.trim() && (
+                          <p className="text-gray-700">
+                            <strong>Informação:</strong>{" "}
+                            <span className="break-words">
+                              {item.informacao}
+                            </span>
+                          </p>
+                        )}
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-center text-gray-400 italic">
-                      Até então nenhuma informação adicional...
-                    </p>
-                  )}
+                    ))}
                 </div>
               </div>
 
@@ -273,13 +277,13 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     </div>
                   )}
 
-                  {data.ultimaOcorrencia.listaCartaz?.length > 0 && (
+                  {(data.ultimaOcorrencia.listaCartaz ?? []).length > 0 && (
                     <div>
                       <strong className="text-md font-semibold">
                         Lista de cartaz:
                       </strong>
                       <ul className="ml-5 list-disc">
-                        {data.ultimaOcorrencia.listaCartaz.map(
+                        {(data.ultimaOcorrencia.listaCartaz ?? []).map(
                           (cartaz, idx) => (
                             <li key={idx}>
                               <a

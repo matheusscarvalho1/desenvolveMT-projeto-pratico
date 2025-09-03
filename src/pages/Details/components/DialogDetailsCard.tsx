@@ -35,7 +35,6 @@ import {
 } from "../../../components/ui/popover";
 import { Textarea } from "../../../components/ui/textarea";
 import type { OcorrenciaInfoDTO } from "../../../interface/interface";
-import { api } from "../../../lib/api";
 import { cn } from "../../../lib/utils";
 interface LoginDialogProps {
   isOpen: boolean;
@@ -75,33 +74,21 @@ const DialogDetailsCard = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
-      const formData = new FormData();
-      const params = new URLSearchParams({
+      console.log("Form enviado:", values);
+      const novaInformacao: OcorrenciaInfoDTO = {
+        id: Date.now(),
+        ocoId: ocoId,
+        data: values.data!.toISOString(),
         informacao: values.informacao,
-        descricao: values.descricao,
-        data: values.data.toISOString().split("T")[0],
-        ocoId: ocoId.toString(),
-      });
+        anexos: values.files
+          ? values.files.map((f: File) => URL.createObjectURL(f))
+          : [],
+      };
 
-      if (values.files && values.files.length > 0) {
-        values.files.forEach((file: File) => {
-          formData.append("files", file);
-        });
-      }
-
-      const response = await api.post(
-        `/ocorrencias/informacoes-desaparecido?${params.toString()}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
+      console.log("Nova informação criada:", novaInformacao);
 
       if (onSaveSuccess) {
-        onSaveSuccess(response.data);
+        onSaveSuccess(novaInformacao);
       }
 
       onOpenChange(false);
@@ -109,6 +96,7 @@ const DialogDetailsCard = ({
       toast.success("Informação adicionada com sucesso!");
     } catch (error) {
       console.error("Detalhe técnico do erro:", error);
+      toast.error("Erro ao adicionar informação!");
     }
   };
   return (
