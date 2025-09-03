@@ -24,38 +24,14 @@ export interface OcorrenciaDTO {
   listaCartaz: OcorrenciaCartazDTO[];
 }
 
-// export interface PersonDTO {
-//   id: number;
-//   nome: string;
-//   idade: number;
-//   sexo: "MASCULINO" | "FEMININO";
-//   vivo: boolean;
-//   urlFoto?: string;
-//   ultimaOcorrencia?: OcorrenciaDTO;
-// }
-
 export interface PersonDTO {
   id: number;
   nome: string;
   idade: number;
-  sexo: string; // Mantido como string para flexibilidade
+  sexo: "MASCULINO" | "FEMININO";
   vivo: boolean;
-  urlFoto: string | null; // Permite null
-  ultimaOcorrencia: {
-    dtDesaparecimento: string;
-    dataLocalizacao: string | null;
-    encontradoVivo: boolean;
-    localDesaparecimentoConcat: string;
-    ocorrenciaEntrevDesapDTO: {
-      informacao: string | null;
-      vestimentasDesaparecido: string | null;
-      [key: string]: any; // Permite propriedades adicionais
-    };
-    listaCartaz: any[] | null;
-    ocoId: number;
-    [key: string]: any; // Permite propriedades adicionais
-  };
-  [key: string]: any; // Permite propriedades adicionais
+  urlFoto?: string;
+  ultimaOcorrencia?: OcorrenciaDTO;
 }
 
 export interface FormFilter {
