@@ -37,8 +37,8 @@ const Details = () => {
   }, [id]);
 
   if (loading) return <Loading />;
-  if (!data?.id || Number(id) !== data.id) return <NotFound />;
   if (error) return <InternalServerError />;
+  if (!data?.id || Number(id) !== data.id) return <NotFound />;
 
   return (
     <>

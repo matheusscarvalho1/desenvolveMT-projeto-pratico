@@ -28,7 +28,7 @@ export interface PersonDTO {
   id: number;
   nome: string;
   idade: number;
-  sexo: "MASCULINO" | "FEMININO";
+  sexo: string;
   vivo: boolean;
   urlFoto?: string;
   ultimaOcorrencia?: OcorrenciaDTO;

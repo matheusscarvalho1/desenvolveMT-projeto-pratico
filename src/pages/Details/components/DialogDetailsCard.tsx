@@ -176,7 +176,7 @@ const DialogDetailsCard = ({
                   <FormControl>
                     <Textarea
                       className="pl-4 text-sm"
-                      placeholder="Descreva detalhadamente as circunstâncias do desaparecimento, características físicas, vestimentas e qualquer informação que possa ajudar na localização."
+                      placeholder="Descreva detalhadamente as circunstâncias do desaparecimento, características físicas, vestimentas, localização avistada e qualquer informação que possa ajudar na localização."
                       {...field}
                     />
                   </FormControl>
