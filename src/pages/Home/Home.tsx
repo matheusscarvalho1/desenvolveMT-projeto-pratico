@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod/v3";
 
+// Importar dados locais temporariamente
+import jsonData from "../../abitus-pessoas.json";
 import { Button } from "../../components/ui/button";
 import {
   Form,
@@ -33,20 +33,24 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import type { FormFilter, PersonDTO } from "../../interface/interface";
-import { api } from "../../lib/api";
+import { handleError } from "../../lib/utils";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 import InternalServerError from "../Error/internal-server-error";
 import Board from "./components/Board";
 
+// Extrair o array de pessoas da estrutura do JSON
+const pessoasData = jsonData.data.content;
+
 const Home = () => {
   const [data, setData] = useState<PersonDTO[]>([]);
-  const [totalPages, setTotalPages] = useState<number>();
-  const [totalElements, setTotalElements] = useState<number>();
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [filters, setFilters] = useState<FormFilter>({});
 
   const formSchema = z.object({
@@ -64,7 +68,7 @@ const Home = () => {
       .optional()
       .nullable(),
     sexo: z.string().optional(),
-    status: z.string().optional(),
+    status: z.enum(["DESAPARECIDO", "LOCALIZADO"]).optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,28 +78,144 @@ const Home = () => {
       faixaIdadeInicial: null,
       faixaIdadeFinal: null,
       sexo: "",
-      status: "",
+      status: "DESAPARECIDO",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const newFilters: FormFilter = {};
+  // Função para determinar o status baseado na data de localização
+  const getStatus = (pessoa: any) => {
+    return pessoa.ultimaOcorrencia?.dataLocalizacao
+      ? "LOCALIZADO"
+      : "DESAPARECIDO";
+  };
+  const validateAndTransformPerson = (person: any): PersonDTO => {
+    return {
+      id: person.id || 0,
+      nome: person.nome || "",
+      idade: person.idade || 0,
+      sexo: person.sexo || "",
+      vivo: person.vivo || false,
+      urlFoto: person.urlFoto || null,
+      ultimaOcorrencia: {
+        dtDesaparecimento: person.ultimaOcorrencia?.dtDesaparecimento || "",
+        dataLocalizacao: person.ultimaOcorrencia?.dataLocalizacao || null,
+        encontradoVivo: person.ultimaOcorrencia?.encontradoVivo || false,
+        localDesaparecimentoConcat:
+          person.ultimaOcorrencia?.localDesaparecimentoConcat || "",
+        ocorrenciaEntrevDesapDTO: {
+          informacao:
+            person.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO?.informacao ||
+            null,
+          vestimentasDesaparecido:
+            person.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO
+              ?.vestimentasDesaparecido || null,
+          ...person.ultimaOcorrencia?.ocorrenciaEntrevDesapDTO,
+        },
+        listaCartaz: person.ultimaOcorrencia?.listaCartaz || null,
+        ocoId: person.ultimaOcorrencia?.ocoId || 0,
+        ...person.ultimaOcorrencia,
+      },
+      ...person,
+    };
+  };
 
-    if (values.nome) newFilters.nome = values.nome;
-    if (values.faixaIdadeInicial)
-      newFilters.faixaIdadeInicial = values.faixaIdadeInicial;
-    if (values.faixaIdadeFinal)
-      newFilters.faixaIdadeFinal = values.faixaIdadeFinal;
-    if (values.sexo) newFilters.sexo = values.sexo;
-    if (values.status) newFilters.status = values.status;
+  // Função para filtrar dados localmente (substituição temporária da API)
+  const filterLocalData = (
+    filters: FormFilter,
+    pageNumber: number = 0,
+    pageSize: number = 10,
+  ) => {
+    let filteredData = pessoasData.map(validateAndTransformPerson);
+
+    // Aplicar filtros
+    if (filters.nome) {
+      filteredData = filteredData.filter((person) =>
+        person.nome.toLowerCase().includes(filters.nome!.toLowerCase()),
+      );
+    }
+
+    if (
+      filters.faixaIdadeInicial !== undefined &&
+      filters.faixaIdadeInicial !== null
+    ) {
+      filteredData = filteredData.filter(
+        (person) => person.idade >= filters.faixaIdadeInicial!,
+      );
+    }
+
+    if (
+      filters.faixaIdadeFinal !== undefined &&
+      filters.faixaIdadeFinal !== null
+    ) {
+      filteredData = filteredData.filter(
+        (person) => person.idade <= filters.faixaIdadeFinal!,
+      );
+    }
+
+    if (filters.sexo) {
+      filteredData = filteredData.filter(
+        (person) => person.sexo === filters.sexo,
+      );
+    }
+
+    if (filters.status) {
+      filteredData = filteredData.filter((person) => {
+        const personStatus = getStatus(person);
+        return personStatus === filters.status;
+      });
+    }
+
+    // Calcular paginação
+    const totalElements = filteredData.length;
+    const totalPages = Math.ceil(totalElements / pageSize);
+    const startIndex = pageNumber * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+
+    return {
+      content: paginatedData,
+      totalElements,
+      totalPages,
+      number: pageNumber,
+      size: pageSize,
+    };
+  };
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    const newFilters = Object.fromEntries(
+      Object.entries(values).filter(
+        ([_, value]) => value !== null && value !== "" && value !== "TODOS",
+      ),
+    );
 
     setFilters(newFilters);
-
     fetchData(0, newFilters);
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 0) {
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      fetchData(newPage, filters);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages - 1) {
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      fetchData(newPage, filters);
+    }
+  };
+
+  const handlePageClick = (page: number) => {
+    setCurrentPage(page);
+    fetchData(page, filters);
   };
 
   const handleClearFilters = () => {
     setFilters({});
+    setCurrentPage(0);
     form.reset();
     fetchData(0, {});
   };
@@ -104,47 +224,19 @@ const Home = () => {
     pageNumber: number = 0,
     customFilters?: FormFilter,
   ) => {
-    setLoading(true);
     try {
-      const currentFilters = customFilters || filters;
+      // Aqui você usa seus dados locais ou API
+      const response = filterLocalData(customFilters || {}, pageNumber, 10);
 
-      const params: FormFilter = {
-        pagina: pageNumber,
-        porPagina: 10,
-      };
-
-      if (currentFilters.nome) params.nome = currentFilters.nome;
-      if (currentFilters.faixaIdadeInicial)
-        params.faixaIdadeInicial = currentFilters.faixaIdadeInicial;
-      if (currentFilters.faixaIdadeFinal)
-        params.faixaIdadeFinal = currentFilters.faixaIdadeFinal;
-      if (currentFilters.sexo) params.sexo = currentFilters.sexo;
-      if (currentFilters.status) params.status = currentFilters.status;
-
-      const response = await api.get("/pessoas/aberto/filtro", { params });
-      console.log(params);
-
-      setData(response.data.content);
-      setTotalPages(response.data.totalPages);
-      setTotalElements(response.data.totalElements);
-      setCurrentPage(response.data.number);
-      console.log("response.data.content", response.data.content);
-      console.log("response.data:", response.data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        const msg = error.response?.data?.message || error.message;
-        console.error("Erro na requisição:", msg);
-        setError(msg);
-        toast.error(msg);
-      } else if (error instanceof Error) {
-        console.error("Erro na requisição:", error.message);
-        setError(error.message);
-        toast.error(error.message);
-      } else {
-        console.error("Erro desconhecido:", error);
-        setError("Erro desconhecido");
-        toast.error("Erro desconhecido");
-      }
+      console.log(response);
+      setData(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+      //setCurrentPage(response.number); // mantém a página atual
+    } catch (error) {
+      const message = handleError(error);
+      setError(message);
+      console.error("Detalhe técnico do erro:", error);
     } finally {
       setLoading(false);
     }
@@ -168,6 +260,16 @@ const Home = () => {
           <p className="text-muted-foreground mt-2">
             Utilize os filtros abaixo para buscar pessoas desaparecidas
           </p>
+          {totalElements > 0 && (
+            <div className="text-muted-foreground mt-4 flex items-center gap-2 text-sm">
+              <span>Total de registros encontrados: {totalElements}</span>
+              {totalPages > 1 && (
+                <span>
+                  • Página {currentPage + 1} de {totalPages}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <Form {...form}>
           <form
@@ -182,7 +284,7 @@ const Home = () => {
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-ba w-full cursor-pointer border-blue-200 bg-white"
+                      className="w-full cursor-pointer border-blue-200 bg-white"
                       placeholder="Insira o nome"
                       {...field}
                     />
@@ -300,37 +402,61 @@ const Home = () => {
                 variant="outline"
                 size="lg"
                 className="cursor-pointer"
-                type="submit"
+                type="button"
                 onClick={handleClearFilters}
               >
-                Limpar filtro
+                Limpar filtros
               </Button>
             </div>
           </form>
         </Form>
       </div>
       <Board data={data} />
-      <div className="container">
-        <h2>Pagination</h2>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">
-                {Number(currentPage!) + 1}
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+      <div></div>
+      <Pagination className="p-6">
+        <PaginationContent className="flex gap-6">
+          <PaginationItem className="cursor-pointer">
+            <PaginationPrevious
+              className={
+                currentPage === 0 ? "pointer-events-none opacity-50" : undefined
+              }
+              onClick={handlePrevious}
+            />
+          </PaginationItem>
+          {Array.from({ length: totalPages }, (_, i) => i)
+            .filter(
+              (i) =>
+                i === 0 ||
+                i === totalPages - 1 ||
+                (i >= currentPage - 2 && i <= currentPage + 2),
+            )
+            .map((i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  className={`cursor-pointer rounded px-3 py-1 ${
+                    currentPage === i
+                      ? "bg-gray-800 font-bold text-gray-100"
+                      : ""
+                  }`}
+                  onClick={() => handlePageClick(i)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+          <PaginationItem className="cursor-pointer">
+            <PaginationNext
+              className={
+                currentPage === totalPages - 1
+                  ? "pointer-events-none opacity-50"
+                  : undefined
+              }
+              onClick={handleNext}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+
       <Footer />
     </div>
   );
