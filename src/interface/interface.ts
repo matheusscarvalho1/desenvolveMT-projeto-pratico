@@ -10,27 +10,27 @@ export interface OcorrenciaCartazDTO {
 }
 
 export interface OcorrenciaEntrevDesapDTO {
-  informacao: string;
-  vestimentasDesaparecido: string;
+  informacao: string | null;
+  vestimentasDesaparecido: string | null;
 }
 
 export interface OcorrenciaDTO {
-  dtDesaparecimento: string;
-  dataLocalizacao: string;
+  dtDesaparecimento: string; // sempre string ISO
+  dataLocalizacao: string | null;
   encontradoVivo: boolean;
   localDesaparecimentoConcat: string;
   ocoId: number;
-  ocorrenciaEntrevDesapDTO: OcorrenciaEntrevDesapDTO;
-  listaCartaz: OcorrenciaCartazDTO[];
+  ocorrenciaEntrevDesapDTO: OcorrenciaEntrevDesapDTO | null; // ← aqui
+  listaCartaz: OcorrenciaCartazDTO[] | null;
 }
 
 export interface PersonDTO {
   id: number;
   nome: string;
   idade: number;
-  sexo: string;
+  sexo: "MASCULINO" | "FEMININO" | string;
   vivo: boolean;
-  urlFoto?: string;
+  urlFoto: string | null;
   ultimaOcorrencia?: OcorrenciaDTO;
 }
 
@@ -44,6 +44,7 @@ export interface FormFilter {
   porPagina?: number;
 }
 
+/** Esse DTO parece ser de outro endpoint, não do filtro de pessoas */
 export interface OcorrenciaInfoDTO {
   ocoId: number;
   informacao: string;

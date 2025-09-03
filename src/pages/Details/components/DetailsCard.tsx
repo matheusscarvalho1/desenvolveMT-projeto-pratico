@@ -3,6 +3,7 @@ import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
+import jsonData from "../../../../public/abitus-pessoas.json";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import type {
@@ -48,19 +49,22 @@ const DetailsCard = ({ data }: DetailsProps) => {
   const fetchData = async (ocorrenciaId: number) => {
     setLoading(true);
     if (!ocorrenciaId) return;
+
     try {
-      const response = await api.get(
-        `/ocorrencias/informacoes-desaparecido?ocorrenciaId=${ocorrenciaId}`,
+      const ocorrencias: OcorrenciaInfoDTO[] = jsonData.data.content.map(
+        (item) => ({
+          id: item.id,
+          ocoId: item.ocoId,
+          data: item.dtDesaparecimento,
+          informacao: item.informacao || "",
+          anexos: item.anexos || [],
+        }),
       );
-
-      const sortedData = sortOcorrencias(response.data);
-
+      const sortedData = sortOcorrencias(ocorrencias);
       setOcorrenciaResource(sortedData);
-      console.log(response);
     } catch (error) {
       const message = handleError(error);
       setError(message);
-
       console.error("Detalhe técnico do erro:", error);
     } finally {
       setLoading(false);
