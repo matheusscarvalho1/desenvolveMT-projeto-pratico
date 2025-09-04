@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate } from "react-router";
 
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
@@ -9,11 +9,11 @@ interface PersonCardProps {
 }
 
 const PersonCard = ({ pessoa }: PersonCardProps) => {
-  const [searchParams] = useSearchParams();
-  const statusFilter = searchParams.get("status");
+  const isLocalizado =
+    pessoa.ultimaOcorrencia?.encontradoVivo === true ||
+    pessoa.ultimaOcorrencia?.dataLocalizacao !== null;
 
-  const status =
-    statusFilter === "LOCALIZADO" ? "Localizado(a)" : "Desaparecido(a)";
+  const statusBadge = isLocalizado ? "Localizado(a)" : "Desaparecido(a)";
 
   const navigate = useNavigate();
 
@@ -41,12 +41,12 @@ const PersonCard = ({ pessoa }: PersonCardProps) => {
       <div className="space-y-2 p-5">
         <Badge
           className={`rounded-full px-3 py-1 text-sm font-semibold ${
-            status === "Desaparecido(a)"
+            statusBadge === "Desaparecido(a)"
               ? "bg-red-300 text-red-800"
               : "bg-green-300 text-green-800"
           }`}
         >
-          {status}
+          {statusBadge}
         </Badge>
         <h2 className="mb-2 truncate text-lg font-bold text-gray-800">
           {pessoa.nome}

@@ -30,10 +30,11 @@ const DetailsCard = ({ data }: DetailsProps) => {
 
   const navigate = useNavigate();
 
-  const [searchParams] = useSearchParams();
-  const statusFilter = searchParams.get("status");
+  const isLocalizado =
+    data.ultimaOcorrencia?.encontradoVivo === true ||
+    data.ultimaOcorrencia?.dataLocalizacao !== null;
 
-  const status = statusFilter === "LOCALIZADO" ? "Localizada" : "Desaparecida";
+  const statusBadge = isLocalizado ? "Localizado(a)" : "Desaparecido(a)";
   const handleHomePage = () => {
     navigate("/");
   };
@@ -131,12 +132,12 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     <strong className="font-semibold">Status</strong>:{" "}
                     <Badge
                       className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                        status === "Desaparecida"
+                        statusBadge === "Desaparecido(a)"
                           ? "bg-red-300 text-red-800"
                           : "bg-green-300 text-green-800"
                       }`}
                     >
-                      {status}
+                      {statusBadge}
                     </Badge>
                   </div>
                 </div>
