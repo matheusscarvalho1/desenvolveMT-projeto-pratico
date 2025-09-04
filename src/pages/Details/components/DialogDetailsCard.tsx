@@ -60,7 +60,10 @@ const DialogDetailsCard = ({
     }),
     files: z
       .array(z.instanceof(File))
-      .max(3, "Você só pode enviar até 3 arquivos"),
+      .max(
+        2,
+        "Você só pode enviar até 2 arquivos, se possui mais de um arquivo word ou pdf, tente juntar todos em um arquivo só para enviar somente ele.",
+      ),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,7 +71,7 @@ const DialogDetailsCard = ({
     defaultValues: {
       informacao: "",
       data: undefined,
-      files: undefined,
+      files: [],
     },
   });
 
@@ -192,7 +195,7 @@ const DialogDetailsCard = ({
               name="files"
               render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
-                  <FormLabel>Anexos</FormLabel>
+                  <FormLabel>Anexos (Opcional)</FormLabel>
                   <FormControl>
                     <Input
                       data-testid="files-input"
@@ -208,7 +211,7 @@ const DialogDetailsCard = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    O limite é de 3 arquivos por vez. <br />
+                    O limite é de 2 arquivos por vez. <br />
                     Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
                     (.doc, .docx e PDFs.)
                   </FormDescription>
