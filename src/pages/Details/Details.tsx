@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
+import Footer from "../../components/common/Footer";
+import Header from "../../components/common/Header";
+import Loading from "../../components/common/Loading";
 import type { PersonDTO } from "../../interface/interface";
 import { api } from "../../lib/api";
 import { handleError } from "../../lib/utils";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
-import Loading from "../components/Loading";
 import InternalServerError from "../Error/internal-server-error";
 import NotFound from "../Error/not-found-error";
 import DetailsCard from "./components/DetailsCard";

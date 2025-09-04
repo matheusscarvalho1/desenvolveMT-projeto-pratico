@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { Toaster } from "sonner";
 
-import Loading from "./pages/components/Loading";
+import Loading from "./components/common/Loading";
 import NotFound from "./pages/Error/not-found-error";
 
 const Home = lazy(() => import("./pages/Home/Home"));

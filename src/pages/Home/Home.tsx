@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod/v3";
 
+import Footer from "../../components/common/Footer";
+import Header from "../../components/common/Header";
+import Loading from "../../components/common/Loading";
 import { Button } from "../../components/ui/button";
 import {
   Form,
@@ -33,9 +36,6 @@ import {
 } from "../../components/ui/select";
 import type { FormFilter, PersonDTO } from "../../interface/interface";
 import { api } from "../../lib/api";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
-import Loading from "../components/Loading";
 import InternalServerError from "../Error/internal-server-error";
 import Board from "./components/Board";
 
@@ -43,6 +43,7 @@ const Home = () => {
   const [data, setData] = useState<PersonDTO[]>([]);
   const [totalPages, setTotalPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalElements, setTotalElements] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FormFilter>({});
@@ -142,6 +143,7 @@ const Home = () => {
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
       setCurrentPage(response.data.number);
+      setTotalElements(response.data.totalElements);
       console.log("response.data.content", response.data.content);
       console.log("response.data:", response.data);
     } catch (error: unknown) {
@@ -323,8 +325,19 @@ const Home = () => {
           </form>
         </Form>
       </div>
+      <div className="p-6 text-sm text-gray-600">
+        {totalElements > 0 ? (
+          <>
+            Exibindo <strong>{data.length}</strong> de{" "}
+            <strong>{totalElements}</strong> resultado
+            {totalElements !== 1 ? "s" : ""}
+          </>
+        ) : (
+          "Nenhum resultado encontrado"
+        )}
+      </div>
       <Board data={data} />
-      {totalPages && totalPages > 1 && (
+      {totalPages && totalPages > 0 && (
         <Pagination className="p-6">
           <PaginationContent className="flex gap-6">
             <PaginationItem className="cursor-pointer">

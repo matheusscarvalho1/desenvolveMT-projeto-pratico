@@ -3,6 +3,7 @@ import { ptBR } from "date-fns/locale";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
+import Loading from "../../../components/common/Loading";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
 import type {
@@ -11,7 +12,6 @@ import type {
 } from "../../../interface/interface";
 import { api } from "../../../lib/api";
 import { handleError } from "../../../lib/utils";
-import Loading from "../../components/Loading";
 import InternalServerError from "../../Error/internal-server-error";
 import NotFound from "../../Error/not-found-error";
 import DialogDetailsCard from "./DialogDetailsCard";
@@ -138,7 +138,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     </Badge>
                   </div>
                 </div>
-                <div className="max-h-89 space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-2">
+                <div className="max-h-89 space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-6 sm:w-xl">
                   <h2 className="text-2xl font-bold text-gray-800">
                     Últimas informações
                   </h2>

@@ -204,7 +204,7 @@ const DialogDetailsCard = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    O limite é de 2 arquivos por vez. <br />
+                    O limite é de 2 a 3 arquivos por vez. <br />
                     Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
                     Word (.doc, .docx) e PDFs.
                   </FormDescription>
