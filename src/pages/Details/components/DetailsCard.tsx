@@ -56,7 +56,6 @@ const DetailsCard = ({ data }: DetailsProps) => {
       const sortedData = sortOcorrencias(response.data);
 
       setOcorrenciaResource(sortedData);
-      console.log(response);
     } catch (error) {
       const message = handleError(error);
       setError(message);
@@ -92,20 +91,23 @@ const DetailsCard = ({ data }: DetailsProps) => {
   if (error) return <InternalServerError />;
   return (
     <>
-      <div className="flex min-h-screen flex-col bg-gray-50">
+      <div
+        data-testid="details-card"
+        className="flex min-h-screen flex-col bg-gray-50"
+      >
         <div className="flex flex-grow justify-center px-4 py-6">
           <div className="container rounded-lg bg-white p-6 shadow">
             <h1 className="mb-6 text-2xl font-bold text-gray-800">
               <strong>{data.nome}</strong>
             </h1>
             <div className="space-y-4">
-              <div className="flex flex-col items-start gap-6 sm:flex md:flex-row">
+              <div className="flex flex-col items-start gap-6 md:flex-row">
                 {data.urlFoto ? (
                   <div>
                     <img
                       src={data.urlFoto}
                       alt={data.nome}
-                      className="max-w-full rounded-2xl md:max-w-xs"
+                      className="w-full rounded-2xl md:w-xs"
                     />
                   </div>
                 ) : (
@@ -138,7 +140,7 @@ const DetailsCard = ({ data }: DetailsProps) => {
                     </Badge>
                   </div>
                 </div>
-                <div className="max-h-89 space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-6 sm:w-xl">
+                <div className="max-h-[50vh] w-full space-y-2 overflow-y-auto rounded-md border bg-gray-50 p-4 md:w-xl">
                   <h2 className="text-2xl font-bold text-gray-800">
                     Últimas informações
                   </h2>
@@ -149,7 +151,6 @@ const DetailsCard = ({ data }: DetailsProps) => {
                         className="w-full rounded-lg border border-blue-500 bg-white p-3 transition-colors hover:bg-gray-50"
                       >
                         <div className="mb-1 flex flex-col justify-between sm:flex-row">
-                          {/* Exibe a data, tentei usar somente o new Data, acredito que por algum motivo de fuso sempre mostrava um dia antes da data correta */}
                           <span className="text-sm text-gray-500">
                             {format(parseISO(item.data), "dd/MM/yyyy", {
                               locale: ptBR,
@@ -160,10 +161,10 @@ const DetailsCard = ({ data }: DetailsProps) => {
                               {item.anexos.map((anexo: string, idx: number) => (
                                 <a
                                   key={idx}
-                                  href={`${anexo.trim()}`}
+                                  href={anexo.trim()}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 transition-colors hover:bg-blue-200"
+                                  className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-medium break-words text-blue-800 transition-colors hover:bg-blue-200"
                                 >
                                   Anexo {idx + 1}
                                 </a>
@@ -171,7 +172,6 @@ const DetailsCard = ({ data }: DetailsProps) => {
                             </div>
                           )}
                         </div>
-
                         <p className="text-gray-700">
                           <strong>Informação:</strong>{" "}
                           <span className="break-words">{item.informacao}</span>

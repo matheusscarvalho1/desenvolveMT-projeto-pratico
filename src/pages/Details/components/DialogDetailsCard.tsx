@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -54,9 +55,6 @@ const DialogDetailsCard = ({
     informacao: z.string().min(5, {
       message: "Mensagem deve ter pelo menos 5 caracteres.",
     }),
-    descricao: z.string().min(5, {
-      message: "Mensagem deve ter pelo menos 5 caracteres.",
-    }),
     data: z.date({
       message: "Por favor, selecione uma data",
     }),
@@ -67,19 +65,17 @@ const DialogDetailsCard = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       informacao: "",
-      descricao: "",
       data: undefined,
       files: undefined,
     },
   });
 
+  const [openCalendar, setOpenCalendar] = useState(false);
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
       const formData = new FormData();
       const params = new URLSearchParams({
         informacao: values.informacao,
-        descricao: values.descricao,
         data: values.data.toISOString().split("T")[0],
         ocoId: ocoId.toString(),
       });
@@ -116,7 +112,7 @@ const DialogDetailsCard = ({
       <Button className="cursor-pointer" variant="default" size="lg" asChild>
         <DialogTrigger>Adicionar mais informações</DialogTrigger>
       </Button>
-      <DialogContent className="xl:min-w-3xl">
+      <DialogContent data-testid="dialog" className="max-w-fit">
         <DialogHeader className="text-left">
           <DialogTitle>Adicionar Informações</DialogTitle>
           <DialogDescription>
@@ -132,9 +128,10 @@ const DialogDetailsCard = ({
                 <FormItem>
                   <FormLabel>Data do ocorrido</FormLabel>
                   <FormControl>
-                    <Popover>
+                    <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
                       <PopoverTrigger asChild>
                         <Button
+                          data-testid="data-input"
                           variant="outline"
                           className={cn(
                             "w-[280px] justify-start text-left font-normal",
@@ -156,7 +153,10 @@ const DialogDetailsCard = ({
                         <Calendar
                           mode="single"
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            field.onChange(date);
+                            setOpenCalendar(false);
+                          }}
                           locale={ptBR}
                           disabled={{ after: new Date() }}
                         />
@@ -175,6 +175,7 @@ const DialogDetailsCard = ({
                   <FormLabel>Informações relevantes do ocorrido</FormLabel>
                   <FormControl>
                     <Textarea
+                      data-testid="info-input"
                       className="pl-4 text-sm"
                       placeholder="Descreva detalhadamente as circunstâncias do desaparecimento, características físicas, vestimentas e qualquer informação que possa ajudar na localização."
                       {...field}
@@ -192,6 +193,7 @@ const DialogDetailsCard = ({
                   <FormLabel>Anexos</FormLabel>
                   <FormControl>
                     <Input
+                      data-testid="files-input"
                       {...fieldProps}
                       type="file"
                       multiple
@@ -206,25 +208,8 @@ const DialogDetailsCard = ({
                   <FormDescription>
                     O limite é de 2 a 3 arquivos por vez. <br />
                     Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
-                    Word (.doc, .docx) e PDFs.
+                    (.doc, .docx e PDFs.)
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição do Anexo</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className="pl-4 text-sm"
-                      placeholder="Insira a descrição do anexo colocado no campo acima"
-                      {...field}
-                    />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

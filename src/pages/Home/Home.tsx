@@ -138,14 +138,11 @@ const Home = () => {
       if (currentFilters.status) params.status = currentFilters.status;
 
       const response = await api.get("/pessoas/aberto/filtro", { params });
-      console.log(params);
 
       setData(response.data.content);
       setTotalPages(response.data.totalPages);
       setCurrentPage(response.data.number);
       setTotalElements(response.data.totalElements);
-      console.log("response.data.content", response.data.content);
-      console.log("response.data:", response.data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const msg = error.response?.data?.message || error.message;
