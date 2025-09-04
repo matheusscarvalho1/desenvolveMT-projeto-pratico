@@ -17,6 +17,6 @@ EXPOSE 3000
 
 CMD ["serve", "--single", "dist", "-l", "3000"]
 
-# docker build -t desenvolve-mt-app .
+# docker build -t projeto-desenvolve-mt-app-by-matheus-carvalho .
 
-# docker run -p 3000:3000 desenvolve-mt-app
+# docker run -p 3000:3000 projeto-desenvolve-mt-app-by-matheus-carvalho
