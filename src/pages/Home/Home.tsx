@@ -3,7 +3,6 @@ import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod/v3";
 
 import Footer from "../../components/common/Footer";
@@ -148,15 +147,15 @@ const Home = () => {
         const msg = error.response?.data?.message || error.message;
         console.error("Erro na requisição:", msg);
         setError(msg);
-        toast.error(msg);
+        // toast.error(msg);
       } else if (error instanceof Error) {
         console.error("Erro na requisição:", error.message);
         setError(error.message);
-        toast.error(error.message);
+        // toast.error(error.message);
       } else {
         console.error("Erro desconhecido:", error);
         setError("Erro desconhecido");
-        toast.error("Erro desconhecido");
+        // toast.error("Erro desconhecido");
       }
     } finally {
       setLoading(false);
