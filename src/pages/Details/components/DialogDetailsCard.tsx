@@ -58,7 +58,9 @@ const DialogDetailsCard = ({
     data: z.date({
       message: "Por favor, selecione uma data",
     }),
-    files: z.any().optional(),
+    files: z
+      .array(z.instanceof(File))
+      .max(3, "Você só pode enviar até 3 arquivos"),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -206,7 +208,7 @@ const DialogDetailsCard = ({
                     />
                   </FormControl>
                   <FormDescription>
-                    O limite é de 2 a 3 arquivos por vez. <br />
+                    O limite é de 3 arquivos por vez. <br />
                     Aceitamos arquivos de imagem (JPEG, PNG, etc.), documentos
                     (.doc, .docx e PDFs.)
                   </FormDescription>
