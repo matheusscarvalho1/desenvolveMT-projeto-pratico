@@ -8,12 +8,15 @@ RUN npm ci
 
 COPY . ./
 
+RUN npm install -g serve
+
 RUN npm run build
 
-RUN npm install -g serve
 
 EXPOSE 3000
 
-CMD ["serve", "-s", "dist", "-l", "3000"]
+CMD ["serve", "--single", "dist", "-l", "3000"]
 
-# docker build .
+# docker build -t desenvolve-mt-app .
+
+# docker run -p 3000:3000 desenvolve-mt-app
