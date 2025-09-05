@@ -26,7 +26,9 @@ describe("Internal Server Error Page", () => {
   it("deve exibir a mensagem de erro interno no servidor", () => {
     render(<InternalServerError />);
     expect(
-      screen.getByText("Ocorreu um erro interno no servidor"),
+      screen.getByText(
+        "Ocorreu um erro interno no servidor, tente novamente mais tarde.",
+      ),
     ).toBeInTheDocument();
   });
 

@@ -8,7 +8,7 @@ const InternalServerError = () => {
       <div className="flex flex-1 flex-col items-center justify-center">
         <h1 className="mb-4 text-6xl font-bold text-red-600">500</h1>
         <p className="mb-6 text-xl text-gray-600">
-          Ocorreu um erro interno no servidor
+          Ocorreu um erro interno no servidor, tente novamente mais tarde.
         </p>
         <a
           href="/"
