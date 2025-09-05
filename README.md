@@ -2,11 +2,11 @@
 
 ## 📋 Dados do Candidato
 
-Nome: Matheus de Souza Carvalho
+Nome Completo: Matheus de Souza Carvalho
 
-Email: matheusdocarvalho@gmail.com
+E-mail: matheusdocarvalho@gmail.com
 
-Telefone: +55 65 99207-9383
+Telefone para contato: +55 65 99207-9383
 
 Aplicação: Avaliação Profissional – Desenvolvedor Júnior
 
