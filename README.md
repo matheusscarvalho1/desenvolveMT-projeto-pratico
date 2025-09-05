@@ -101,6 +101,55 @@ docker images
 ```
 <hr>
 
+### ⚙️ Observações Técnicas e Decisões de Implementação
+
+### Por que optei pelo Vite?
+
+- O principal motivo da escolha do Vite foi o alinhamento com o objetivo do projeto prático, que é desenvolver uma Single Page Application (SPA) em JavaScript (ou TypeScript), ele proporciona um ambiente de desenvolvimento moderno e ágil, com inicialização rápida, hot reload eficiente e build otimizado para produção, o que torna a criação de uma SPA mais simples, performática e aderente ao que o projeto propõe.
+  
+### Sobre a sugestão de utilizar máscaras no formulário
+
+- Vi que no projeto prático solicita a aplicação de máscaras em campos como datas ou telefones.
+
+No formulário, para o campo 'data do ocorrido' da API de 'informações do desaparecido', utilizei um Date Picker, que:
+
+- Garante que a data selecionada esteja sempre no formato correto para a API;
+
+- Evita erros de digitação, melhorando a experiência do usuário;
+
+- Substitui a necessidade de digitar cada dígito ou usar uma máscara manual.
+
+- Todos os campos são validados com Zod, garantindo que os dados enviados estejam corretos, mesmo sem máscaras adicionais.
+
+- Essa abordagem cumpre o requisito do projeto, mantendo usabilidade e confiabilidade no envio das informações.
+- Máscaras no campo são muito bem vindas, e são essenciais pra garantir que usuário forneça os dados como a gente (desenvolvedores) deseja receber, só optei por essa forma com data picker por mais questão de gosto.
+
+### Tratamento de erros da API
+  
+- 404 – Not Found: página exibida para rotas inexistentes.
+
+- 500 – Internal Server Error: página exibida em caso de falha no servidor.
+
+- Função handleError captura erros de requisição e exibe mensagens amigáveis via toast.
+
+### Upload de arquivos
+
+- Durante os testes com a API, percebi que anexar arquivos grandes podem gerar erro 500 da API.
+
+- Para reduzir essa chance, o envio é limitado a **no máximo 2 arquivos por formulário**.
+
+- A aplicação está 100% funcional, apenas com essa limitação para melhorar a experiência do usuário evitando o erro.
+  
+- Tipos de arquivos aceitos: imagens (JPEG, PNG) e documentos (.pdf, .doc, .docx).
+
+- Caso ocorra erro por tamanho ou formato inválido, o usuário recebe uma mensagem clara via toast:  
+  *"Verifique se os arquivos não são muito grandes ou estão em formato inválido."*
+
+ 
+
+
+<hr>
+
 ### 🎯 Funcionalidades
 
 - Lista de pessoas desaparecidas ou localizadas com cards
@@ -156,10 +205,6 @@ docker images
 - <strong>`Testes` - </strong> Vitest + Testing Library para testes unitários e de interação do usuário.
 
 <hr>
-
-#### Por que Vite ao invés de Next.js?
-
-- Projeto é SPA pura, sem necessidade de SSR, Vite oferece build rápido, hot reload instantâneo e configuração mínima e Next.js adicionaria complexidade desnecessária, apesar de ter também conhecimento com next evidenciados em outros projetos em alguns projetos no meu repositório do github.
 
 ## 📁 Estrutura do Projeto
 
