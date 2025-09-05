@@ -2,11 +2,11 @@
 
 ## 📋 Dados do Candidato
 
-Nome: Matheus de Souza Carvalho
+Nome Completo: Matheus de Souza Carvalho
 
-Email: matheusdocarvalho@gmail.com
+E-mail: matheusdocarvalho@gmail.com
 
-Telefone: +55 65 99207-9383
+Telefone para contato: +55 65 99207-9383
 
 Aplicação: Avaliação Profissional – Desenvolvedor Júnior
 
@@ -131,29 +131,29 @@ docker images
 
 ### 💡 Implementações Técnicas
 
-- <strong>React + TypeScript - </strong> Base da aplicação com tipagem estática e componentes reutilizáveis.
+- <strong>`React + TypeScript` - </strong> Base da aplicação com tipagem estática e componentes reutilizáveis.
 
-- <strong>Vite - </strong> Bundler moderno, com build rápido e hot reload para desenvolvimento.
+- <strong>`Vite` - </strong> Bundler moderno, com build rápido e hot reload para desenvolvimento.
 
-- <strong>React Router v7 - </strong> Navegação da SPA com Lazy Loading nas rotas, fallback de carregamento com <Loading /> e tratamento de rotas inexistentes com <NotFound />.
+- <strong>`React Router v7` - </strong> Navegação da SPA com Lazy Loading nas rotas, fallback de carregamento com <Loading /> e tratamento de rotas inexistentes com <NotFound />.
 
-- <strong>Tailwind CSS - </strong> Framework utilitário para UI responsiva.
+- <strong>`Tailwind CSS` - </strong> Framework utilitário para UI responsiva.
 
-- <strong>shadcn/ui + Lucide React Icons - </strong> Componentes prontos e customizáveis com ícones leves e compatíveis nativamente.
+- <strong>`shadcn/ui + Lucide React Icons` - </strong> Componentes prontos e customizáveis com ícones leves e compatíveis nativamente.
 
-- <strong>React Hook Form - </strong> Gerenciamento de formulários e integração com validação de dados.
+- <strong>`React Hook Form` - </strong> Gerenciamento de formulários e integração com validação de dados.
 
-- <strong>Zod - </strong> Validação de schemas de dados (Usado para validadar dados dos formulários), usado junto com React Hook Form.
+- <strong>`Zod` - </strong> Validação de schemas de dados (Usado para validadar dados dos formulários), usado junto com React Hook Form.
 
-- <strong>Axios - </strong> Consumo de APIs e tratamento de requisições HTTP.
+- <strong>`Axios` - </strong> Consumo de APIs e tratamento de requisições HTTP.
   
-- <strong>Sonner - </strong> Notificações e toasts para feedback do usuário.
+- <strong>`Sonner` - </strong> Notificações e toasts para feedback do usuário.
 
-- <strong>Componentes reutilizáveis - </strong> Combinação de componentes .tsx e shadcn/ui.
+- <strong>`Componentes reutilizáveis` - </strong> Combinação de componentes .tsx e shadcn/ui.
 
-- <strong>Tratamento de erros - </strong> Páginas de 404 e mensagens para falhas de requisição.
+- <strong>`Tratamento de erros` - </strong> Páginas de 404 e mensagens para falhas de requisição.
 
-- <strong>Testes - </strong> Vitest + Testing Library para testes unitários e de interação do usuário.
+- <strong>`Testes` - </strong> Vitest + Testing Library para testes unitários e de interação do usuário.
 
 <hr>
 
