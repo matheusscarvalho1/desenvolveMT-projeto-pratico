@@ -111,7 +111,7 @@ const DialogDetailsCard = ({
     } catch (error) {
       handleError(error);
       toast.error(
-        "Erro interno no servidor. Verifique se o arquivo não é muito grande ou está em um formato inválido.",
+        "Erro interno no servidor. Verifique se os arquivos não são muito grandes ou estão em formato inválido.",
       );
       console.error("Erro inesperado:", error);
     }
