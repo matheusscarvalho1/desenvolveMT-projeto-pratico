@@ -1,4 +1,4 @@
-# 🚀 DesenvolveMT – Projeto Prático Front-End
+# 🚀 Desenvolve MT – Projeto Prático Front-End
 
 ## 📋 Dados do Candidato
 
@@ -10,74 +10,102 @@ Telefone: +55 65 99207-9383
 
 Aplicação: Avaliação Profissional – Desenvolvedor Júnior
 
-# 🚀 Como Rodar o Projeto
+
+## ❗ Atenção: detalhes antes de rodar o projeto
+#### No repositório, criei o .env.example que contém a única variável de ambiente utilizada no projeto: a URL da API.
+
+Para rodar o projeto corretamente na sua máquina:
+
+1. Crie um arquivo chamado .env na raiz do projeto.
+
+2. Copie o todo o conteúdo do arquivo .env.example para o novo arquivo .env.
+
+3. Salve o arquivo.
+
+Pronto! O projeto funcionará corretamente com essa configuração.
+OBS: Fiz dessa forma para não precisar vercionar o .env
+
+## 🚀 Como Rodar o Projeto
 
 Você pode executar a aplicação localmente para desenvolvimento ou via Docker para produção. Além disso, é possível rodar todos os testes com Vitest.
 
 ### 1️⃣ Localmente (Desenvolvimento)
 
-#### Clonar repositório
+#### Clone o repositório
 
-`git clone https://github.com/matheusscarvalho1/desenvolveMT-projeto-pratico.git`
-`cd desenvolveMT-projeto-pratico`
+```
+git clone https://github.com/matheusscarvalho1/desenvolveMT-projeto-pratico.git
+```
+#### Acesse o projeto
 
-# Instalar dependências
+```
+cd desenvolveMT-projeto-pratico
+```
 
-`npm install `
+#### Instalar dependências
 
-# Iniciar servidor de desenvolvimento
+```
+npm install 
+```
 
-`npm run dev`
+#### Iniciar servidor de desenvolvimento
 
-Acesse: http://localhost:5173
+```
+npm run dev
+```
 
-Hot reload automático para alterações instantâneas.
+#### Pronto, basta acessar http://localhost:5173
 
-2️⃣ Build e Preview de Produção
 
-# Build otimizado (TypeScript + Vite)
+### 2️⃣ Build e Preview de Produção
 
-`npm run build`
+### Build otimizado (TypeScript + Vite)
 
-# Visualizar build de produção - Executa utilizando os arquivos do build da aplicação
+```
+npm run build
+```
 
-`npm run preview`
+### Visualizar build de produção - Executa utilizando os arquivos do build da aplicação
 
-Preview roda por padrão em http://localhost:4173
-(ou porta definida pelo Vite).
+```
+npm run preview
+```
 
-3️⃣ Docker (Produção)
+#### Preview roda por padrão em http://localhost:4173
 
-# Construir imagem Docker
+### 3️⃣ Testes
 
-docker build -t desenvolve-mt-app .
-
-# Rodar container
-
-docker run -p 3000:3000 desenvolve-mt-app
-
-Acesse: http://localhost:3000
-
-Para rodar em background:
-
-docker run -d -p 3000:3000 --name app-prod desenvolve-mt-app
-
-Comandos úteis:
-
-docker stop app-prod # Parar container
-docker images # Listar imagens
-
-4️⃣ Testes
-
-# Executar todos os testes
+### Executar todos os testes
 
 `npm run test`
 
 Testes implementados com Vitest e React Testing Library.`
 
-- Os testes foram feitos nos componentes principais para o funncionamento da aplicação, então a aplicação não esta coberta 100% de testes
+- Os testes foram feitos nos componentes principais para o funcionamento da aplicação, então a aplicação não esta coberta 100% de testes.
 
-🎯 Funcionalidades
+### 4️⃣ Docker (Produção)
+
+### Construir imagem Docker
+```
+docker build -t projeto-desenvolve-mt-app-by-matheus-carvalho .
+```
+
+### Rodar container
+
+```
+docker run -p 3000:3000 projeto-desenvolve-mt-app-by-matheus-carvalho
+```
+
+##### Dando tudo certo basta acessar: http://localhost:3000
+
+#### Comandos úteis:
+```
+docker images # Listar imagens para saber se ocorreu tudo certo o build da imagem e a execução do container (deve listar a aplicação após rodar esse comando 'projeto-desenvolve-mt-app-by-matheus-carvalho'
+
+```
+
+
+### 🎯 Funcionalidades
 
 - Lista de pessoas desaparecidas ou localizadas com cards
 
@@ -103,31 +131,28 @@ Testes implementados com Vitest e React Testing Library.`
 
 - Upload de fotos e indicação de localização através do campo 'informação' do formulário
 
-# 💡 Implementações Técnicas
+### 💡 Implementações Técnicas
 
-### React + TypeScript
+- React + TypeScript
 
-### Vite como bundler (SPA, build rápido e hot reload)
+- Vite como bundler (SPA, build rápido e hot reload)
 
-### React Router v7 com Lazy Loading
+- React Router v7 com Lazy Loading
 
-### Tailwind CSS para UI responsiva
+- Tailwind CSS para UI responsiva
 
-### Axios para consumo da API
+- Axios para consumo da API
 
-### Componentes reutilizáveis shadcn/ui
+- Componentes reutilizáveis (componentes .tsx e componentes shadcn/ui)
 
-### Tratamento de erros (404 e falhas de requisição)
+- Tratamento de erros (404 e falhas de requisição)
 
-🤔 Por que Vite ao invés de Next.js?
+#### Por que Vite ao invés de Next.js?
 
-Projeto é SPA pura, sem necessidade de SSR
+- Projeto é SPA pura, sem necessidade de SSR, Vite oferece build rápido, hot reload instantâneo e configuração mínima e Next.js adicionaria complexidade desnecessária, apesar de ter também conhecimento com next evidenciados em outros projetos em alguns projetos no meu repositório do github.
 
-Vite oferece build rápido, hot reload instantâneo e configuração mínima
-
-Next.js adicionaria complexidade desnecessária, apesar de eu também ter conhecimento com next evidenciados em outros projetos meus no github
-
-📁 Estrutura do Projeto
+## 📁 Estrutura do Projeto
+```
 src/
 ├─ assets/ # Imagens e ícones
 ├─ components/ # Componentes reutilizáveis (common e ui)
@@ -146,10 +171,28 @@ src/
 ├─ package.json # Dependências e scripts
 ├─ tsconfig.json # Configuração TypeScript
 └─ vite.config.ts # Configuração Vite
+```
 
-🔧 Scripts Disponíveis
-npm run dev # Servidor dev com hot reload
-npm run build # Build otimizado (TypeScript + Vite)
-npm run preview # Preview da build de produção
-npm run lint # Verifica problemas de lint
-npm run test # Executa todos os testes
+## 🔧 Scripts Disponíveis
+
+#### Iniciar servidor de desenvolvimento
+```
+npm run dev 
+
+```
+#### Build
+```
+npm run build
+```
+#### Preview da build de produção
+```
+npm run preview 
+```
+#### Verifica problemas de lint
+```
+npm run lint 
+```
+#### Executa todos os testes
+```
+npm run test
+```
