@@ -30,10 +30,14 @@ const PersonCard = ({ pessoa }: PersonCardProps) => {
           <img
             src={pessoa.urlFoto}
             alt={pessoa.nome}
-            className="h-full w-full transform rounded-xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+            className="h-full w-full transform cursor-pointer rounded-xl object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+            onClick={() => handleDetails(pessoa.id)}
           />
         ) : (
-          <div className="text-muted-foreground flex h-80 w-80 items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 italic">
+          <div
+            className="text-muted-foreground flex h-80 w-80 cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 p-6 italic"
+            onClick={() => handleDetails(pessoa.id)}
+          >
             Imagem não fornecida
           </div>
         )}
