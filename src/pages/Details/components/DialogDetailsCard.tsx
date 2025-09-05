@@ -37,7 +37,7 @@ import {
 import { Textarea } from "../../../components/ui/textarea";
 import type { OcorrenciaInfoDTO } from "../../../interface/interface";
 import { api } from "../../../lib/api";
-import { cn } from "../../../lib/utils";
+import { cn, handleError } from "../../../lib/utils";
 interface LoginDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -109,11 +109,24 @@ const DialogDetailsCard = ({
       form.reset();
       toast.success("Informação adicionada com sucesso!");
     } catch (error) {
-      console.error("Detalhe técnico do erro:", error);
+      handleError(error);
+      toast.error(
+        "Erro interno no servidor. Verifique se o arquivo não é muito grande ou está em um formato inválido.",
+      );
+      console.error("Erro inesperado:", error);
     }
   };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          form.reset();
+        }
+        onOpenChange(open);
+      }}
+    >
       <Button className="cursor-pointer" variant="default" size="lg" asChild>
         <DialogTrigger>Adicionar mais informações</DialogTrigger>
       </Button>
